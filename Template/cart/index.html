@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block body %}
+        <!-- Breadcumbs start -->
+
+{#  برای پیدا کردن محتوای صفحه به جز هدر و فوتر این موارد رو سرچ کن #}
+
+{#    اگر میخوایید محصولی به طور رایگان قرار بدین در سایت باید شرط  #}
+{#    حلقه for رو علاوه بر وجود مقدار برای total price باید بر وجود مقدار برای pro هم قرار بدین #}
+<div class="e-breadcumb-wrap text-center">
+        <h2 class="e-breadcumb-title">سبد خرید </h2>
+        <ul class="e-breadcumb-kist">
+            <li>
+                <a href="index.html">خانه </a>
+            </li>
+            <li>
+                <a href="javascript:void(0);"> صفحات </a>
+            </li>
+            <li>
+                <a href="javascript:void(0);">سبد خرید  </a>
+            </li>
+        </ul>
+    </div>
+    <!-- Product Category start -->
+    <section class="e-shopcart-wrap">
+        <div class="container">
+        {% if total_price %}
+            <div class="row">
+                <div class="col-xl-9 col-lg-12">
+                    <div class="e-shopcart-sec">
+                        <div class="shopcart-table-wrap mb-30">
+                            <form class="table-responsive">
+                                <table class="shopcart-table">
+                                    <thead>
+                                    <tr>
+                                        <th>محصول </th>
+                                        <th>تعداد </th>
+                                        <th>قیمت </th>
+                                        <th>قیمت جمع </th>
+                                        <th>&nbsp;</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for i in pro %}
+                                        {% if i.1 %}
+                                    <tr>
+                                        <td>
+                                            <div class="sc-productwrap">
+                                                <a href="product_details.html" class="sc-product-thumb">
+                                                    <img src={% static "images/index1/shopcart01.jpg"%} alt={{ i.0 }} class="img-fluid">
+                                                </a>
+                                                <div class="sc-product-details">
+                                                    <a href="{% url 'products_home' %}" class="sc-product-ttl">{{ i.0}}</a>
+{#                                                    <p class="sc-product-sz">اندازه: متوسط </p>#}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="quantity-box">
+                                                <input type="text" class="quantity" value="{{ i.1 }}" style="width: 50%">
+                                                <span class="quantity-minus pa-sub quantity-icon" value="{{ i.4 }}" onclick="delete_cart_num('{{ i.4 }}')"> - </span>
+                                                <span class="quantity-plus  pa-add quantity-icon" value="{{ i.4 }}" onclick="add_api_cart2('{{ i.4 }}')"> + </span>
+                                            </div>
+                                        </td>
+                                        <td><span class="sc-product-prc">{{ i.2 }} تومان</span></td>
+                                        <td><span class="sc-product-prc">{{ i.3 }}</span></td>
+                                        <td>
+                                            <form action="#" method="post">
+                                            <input type="hidden" value="{{ i.4 }}">
+{#                                            <button type="submit" class="sc-produc-remove e-remove-product" value="{{ i.4 }}" onclick="delete_cart('{{ i.4 }}')">#}
+                                             <a class="sc-produc-remove e-remove-product" value="{{ i.4 }}" onclick="delete_cart('{{ i.4 }}')">
+                                                <img src={% static "images/index1/svg/cut.svg"%} alt="icon">
+                                                </a>
+{#                                            </button>#}
+
+                                        </form>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                        <div class="shopcart-bottom mb-30">
+                            <ul class="shopcart-dis-list">
+                                <li>
+                                    <div class="sc-dcinput">
+                                        <div class="sc-diswrap">
+                                            <img src={% static "images/index1/svg/discount_Per.svg"%} alt="icon">
+                                            <span>کد تخفیف</span>
+                                        </div>
+                                        <div class="sc-disinputwrap">
+                                            <form>
+                                                <div class="e-nl-box boreder">
+                                                    <input type="text" placeholder="کد تخفیف را وارد کنید">
+                                                    <a href="javascript:void(0);" class="e-btn newsletter-btn">اعمال کد تخفیف </a>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <a class="e-btn black update-cart" onclick="refresh_cart()">بروز رسانی سبد </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-12">
+                    <div class="e-shopcart-sidebar">
+                        <div class="e-totalsumry mb-30">
+                            <div class="e-totalsumry-header">
+                                <h2 class="e-totalsumry-ttl">خلاصه مجموع سبد خرید</h2>
+                            </div>
+                            <div class="e-totalsumry-body">
+                                <ul class="e-totalsumry-list">
+                                    <li>
+                                        <span class="ts-list-head">مجموع سبد:</span>
+                                        {% if total_price %}
+                                        <span class="ts-list-shead">{{ total_price }} تومان</span>
+                                        {% else %}
+                                        <span class="ts-list-shead"> 0 تومان</span>
+                                        {% endif %}
+                                    </li>
+{#                                    <li>#}
+{#                                        <span class="ts-list-head">حمل و نقل: </span>#}
+{#                                        <span class="ts-list-shead">22000 تومان</span>#}
+{#                                    </li>#}
+                                </ul>
+                                <!-- <a href="javascript:void(0);" class="ts-chngadd">Change Address
+                                    <img src={% static "images/index1/svg/edit.svg"%} alt="edit">
+                                </a> -->
+                            </div>
+{#                            <div class="e-totalsumry-fotr">#}
+{#                                <ul class="e-totalsumry-list total">#}
+{#                                    <li>#}
+{#                                        <span class="ts-list-head">گراند توتال</span>#}
+{#                                        <span class="ts-list-shead">26000 تومان</span>#}
+{#                                    </li>#}
+{#                                </ul>#}
+{#                            </div>#}
+                        </div>
+                    {% if total_price %}
+                        <a href="shipping_cart.html" class="e-btn">پرداخت صورتحساب </a>
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+{#            <div class="no-price" style="background-color:#e9e9e9; border-radius: 15px; width: 450px;padding: 35px;margin: 0 auto 0;">#}
+{#                <div class="no-price-p">#}
+{#                    <p style="color: red;font-weight: bold;font-size: large;text-align: center"> هیچ محصولی در سبد برای نمایش وجود ندارد </p><br>#}
+{#                    <p style="color: red;font-weight: bold;font-size: large;text-align: center"><a href="{% url 'products_home' %}"> رفتن به فروشگاه </a></p>#}
+{#                </div>#}
+{#            </div>#}
+{#            <br />#}
+{#            <br />#}
+            <div class="container-fluid mt-100">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="no-price" style="background-color:#ebeeee; border-radius: 15px; width: 700px;padding: 35px;margin: 0 auto 0;">
+                          <div class="no-price-p">
+                                <div class="col-sm-12 empty-cart-cls text-center"> <img src="{% static 'images/cart/cart.png' %}" width="130" height="130" class="img-fluid mb-4 mr-3">
+                                    <p style="font-size: 25px; font-weight: bold">هیچ محصولی در سبد برای نمایش وجود ندارد</p><br />
+                                    <a href="{% url 'products_home' %}" class="e-btn wishlist-ac" id="linke" data-abc="true" style="border-radius: 3px "> رفتن به فروشگاه </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <br />
+        {% endif %}
+        </div>
+    </section>
+    <script>
+
+    // این تابع برای ما کوکی csrftoken رو دریافت میکنه
+    function getCookie(name) {
+    let cookieValue = null;// برای مقدار کوکی یک متغییر ایجاد کردیم
+
+        // دراینجا میگه که اگر کوکی وجود داشت و برابر با '' نبود ... از ';' کوکی ها رو از هم جدا کن
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+
+        // در اینجا کا یک حلقه for برای پیمایش تک تک کوکی ها ایجاد کردیم
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            // در اینجا میگیم که آیا کوکی مورد نظر نامش csrftoken هستش یا خیر
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    // این تابع رو ما در ارسال درخواست فراخوانی کردیم و از مقدار  csrftoken که به ماداده استفاده میکنیم
+    return cookieValue;
+    }
+
+    function add_api_cart2(id){
+        let http = new XMLHttpRequest();
+        const csrftoken = getCookie('csrftoken');
+        http.open("POST", "{% url 'add_api_cart' %}", true);
+        http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        http.onreadystatechange= function (){
+            if(this.readyState === 4 && this.status === 200){
+
+            {#window.location("{% url 'cart_home' %}")#}
+            {#console.log(data)#}
+            var response = this.responseText;
+            if( response === "out of num"){alert("سقف مجاز افزودن محصول به سبد خرید")}
+            location.reload();
+            }
+        }
+        http.send(
+            "&id_pro=" + id +
+            "&user_id=" + {{user.id}} +
+            "&csrfmiddlewaretoken="+csrftoken
+        );
+    }
+
+    function delete_cart_num(id){
+            let cookie = getCookie('csrftoken')
+            $.post("{% url 'delete_cart_num' %}",
+                {
+                    user_id: {{ user.id }},
+                    id_pro: id,
+                    csrfmiddlewaretoken: cookie
+
+                },
+                function(data, status){
+
+                    location.reload();
+                    console.log(data);
+                    {#$("#message").toggle(1000);#}
+                    {#$("#message").hide(1000);#}
+
+                }
+            );
+        }
+
+        function add_api_cart(id){
+            let cookie = getCookie('csrftoken')
+            $.post("{% url 'add_api_cart' %}",
+                {
+                    user_id: {{ user.id }},
+                    id_pro: id,
+                    csrfmiddlewaretoken: cookie
+
+                },
+                function(data, status){
+
+                    location.reload();
+                    console.log(data);
+                    {#$("#message").toggle(1000);#}
+                    {#$("#message").hide(1000);#}
+
+                }
+            );
+        }
+
+        function delete_cart(id){
+            let cookie = getCookie('csrftoken')
+            $.post("{% url 'delete_cart' %}",
+                {
+                    user_id: {{ user.id }},
+                    id_pro: id,
+                    csrfmiddlewaretoken: cookie
+
+                },
+                function(data, status){
+
+                    location.reload();
+                    console.log(data);
+                    {#$("#message").toggle(1000);#}
+                    {#$("#message").hide(1000);#}
+
+                }
+            );
+        }
+
+        function refresh_cart(){
+        location.reload()
+        }
+    </script>
+{#  برای پیدا کردن محتوای صفحه به جز هدر و فوتر این موارد رو سرچ کن #}
+<!-- Newsletter start -->
+{% endblock body %}

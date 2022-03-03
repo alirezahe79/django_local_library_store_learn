@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dashboard</title>
+    <style>
+         body{
+            margin : 0;
+            padding : 2px;
+            background-color:#f8f8f8;
+            direction : rtl ;
+        }
+        label{
+
+        }
+        .container{
+            margin : 0 auto 0;
+            width : 500px;
+            border-radius: 15px 50px 30px;
+            border: 1px solid white;
+            background-color : #95d5b8;
+        }
+        .inner-div{
+            padding : 25px;
+        }
+        .product_div{
+            width : 450px ;
+            margin : 0 auto 0 ;
+            background-color : #d2b9fb ;
+            border-radius : 30px ;
+
+        }
+        #head{
+            text-align: center;
+            font-weight: 700;
+
+        }
+        </style>
+</head>
+<body>
+<div id="head">
+    <p>ویرایش محصولات</p>
+</div>
+<br />
+  <div class="container">
+      <div class="inner-div">
+    {% for i in list %}
+    <form action="{% url 'edit_product' i.4 %}" method="post">
+        {% csrf_token %}
+        <p>
+            <label for="name_product">نام محصول :
+                <input id="name_product" placeholder="نام محصول" name="name_product" value="{{ i.0 }}">
+            </label>
+        </p>
+        <p>
+            <label for="count_product">قیمت محصول :
+                <input id="count_product" placeholder="تعداد محصول" name="count_product" value="{{ i.1 }}">
+            </label>
+        </p>
+        <p>
+            <label for="price_product">تعداد محصول :
+                <input id="price_product" placeholder="قیمت محصول" name="price_product" value="{{ i.2 }}">
+            </label>
+        </p>
+        <p>
+            <label for="category_product">دسته بندی محصول :
+                <input id="category_product" placeholder="دسته بندی محصول" name="category_product" value="{{ i.3 }}">
+            </label>
+        </p>
+        <p>
+            <input type="submit" value="ویرایش محصول">
+        </p>
+    </form>
+      </div>
+  </div>
+<hr>
+<ul style="list-style:none">
+
+    <li style="list-style:none">
+        <div class="product_div">
+            <div class="inner-div">
+        <span> نام محصول :</span>
+        {% if i.1 %}
+            <span style="color:green">{{ i.0 }}</span><br>
+        {% else %}
+            <span style="color:red">{{ i.0 }}</span><br>
+        {% endif %}
+        {% if i.1 %}<span> تعداد :</span><span>{{ i.1 }}</span> <br>{% endif %}
+        <span> قیمت :</span><span>{{ i.2 }}</span> <br>
+        <span> نام دسته بندی :</span><span>{{ i.3 }}</span> <br>
+        <span> مدیریت :</span>
+        {% if i.1 %}<span><a href="{% url 'edit_product' i.4 %}">ویرایش</a> | <a href="{% url 'delete_product' i.4 %}">حذف</a></span> <br>{% else %} <span style="color:red;font-style: italic;">مقداری برای محصول وجود ندارد</span> {% endif %}
+
+            </div>
+        </div>
+    </li>
+
+</ul>
+{% endfor %}
+
+</body>
+</html>

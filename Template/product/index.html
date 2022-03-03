@@ -1,0 +1,324 @@
+<!doctype html>
+{% load static %}
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dashboard</title>
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+{#    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>#}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/semantic.min.css' %}">
+
+    <script src="{% static 'js/semantic.min.js' %}"></script>
+    <style>
+        body{
+            margin : 0px;
+            padding : 2px;
+            background-color:#f8f8f8;
+            direction : rtl ;
+        }
+        label{
+
+        }
+        .container{
+            margin : 0 auto 0;
+            width : 500px;
+            border-radius: 15px 50px 30px;
+            border: 1px solid white;
+            background-color : #66FFCC;
+        }
+        .inner-div{
+            padding : 25px;
+        }
+        #inner-p{
+            text-align: center;
+        }
+        .product_div{
+            width : 450px ;
+            margin : 0 auto 0 ;
+            background-color : #66FFCC ;
+            border-radius : 30px ;
+            
+        }
+        .pro_img{
+            width : 150px ;
+            margin : 0px 50% 0px 50% ;
+        }
+    </style>
+</head>
+<body>
+<div id="message" style="display: none">
+    <div class="ui form success">
+        <div class="ui success message">
+            <div class="header">Form Completed</div>
+            <p>Product Added</p>
+        </div>
+{#        <div class="ui submit button">Submit</div>#}
+    </div>
+</div>
+    <div class="container">
+        <div class="inner-div">
+<form action="{% url 'add_product' %}" method="post">
+    {% csrf_token %}
+    <p>
+        <label for="name_product">نام محصول :
+            <input id="name_product" placeholder="نام محصول" name="name_product">
+        </label>
+    </p>
+    <p>
+        <label for="price_product">قیمت محصول :
+            <input id="price_product" placeholder="قیمت محصول" name="price_product">
+        </label>
+    </p>
+    <p>
+        <label for="count_product">تعداد محصول :
+            <input id="count_product" placeholder="تعداد محصول" name="count_product">
+        </label>
+    </p>
+    <p>
+        <label for="category_product">دسته بندی محصول :</label>
+        <select name="category_product" id="category_product" onchange="updateSubCategories()">
+            {% for c in category %}
+                <option value="{{ c.0 }}">{{ c.1 }}</option>
+                {#            <option value="{{ c.id }}">{{ c.name }}</option>#}
+            {% endfor %}
+        </select>
+    </p>
+    <p id="sub_cat">
+
+        <label for="subcategory_product">زیر دسته بندی محصول :</label>
+{#        <input type="text" name="subcategory_product" id="subcategory_product" >#}
+        <select name="subcategory_product" id="subcategory_product">
+            <option value="None">هیچ دسته بندی وجود ندارد</option>
+        </select>
+
+    </p>
+
+    <p>
+        <input type="submit" value="درج محصول" onclick="addProduct()">
+    </p>
+    </form>
+    </div>
+        </div>
+<hr>
+<ul style="list-style:none">
+    {% for i in list %}
+    <li style="list-style:none">
+        <div class="product_div">
+            <div class="inner-div">
+                {% if i.1 %}
+                <div class="pro_img">
+                    <img src="#" alt="{{ i.0 }}" style="width:150px ;height : 150px ;"><br> </div>
+            <span> نام محصول :</span>
+                <span style="color:red">{{ i.0 }}</span><br />
+            {% else %}
+                <span style="color:blue">{{ i.0 }}</span><br />
+            {% endif %}
+            {% if i.1 %}<span> تعداد :</span><span>{{ i.1 }}</span><br /> {% endif %}
+            <span> قیمت :</span><span>{{ i.3 }}</span><br />
+            <span> نام دسته بندی :</span><span>{{ i.2 }}</span><br />
+            <span> مدیریت :</span>
+            {% if i.1 %}<span><a href="{% url 'edit_product' i.4 %}" >ویرایش</a> |
+             <a href= "{% url 'delete_product' i.4 %}">حذف</a></span><br />
+                <a href="{% url 'add_cart' i.4 %}">اضافه کردن به سبد خرید</a> |
+                    <button id="add_api_cart" value="{{ i.4 }}" onclick="add_api_cart('{{ i.4 }}')">اضافه کردن به سبد خرید از طریق آجاکس</button>
+            {% else %}
+                <span style="color:gray;font-style: italic;">مقداری برای محصول وجود ندارد</span><br />
+            {% endif %}
+            </div>
+        </div><br />
+        </li>
+    {% endfor %}
+</ul>
+{#<a href="{% url 'logout' %}" title="Logout">خروج</a>#}
+    <!-- در اینجا چند خط کامنت شدهsearch here word -->
+<script>
+    // در اینجا ما نمایش زیر دسته بندی ها رو غیر فعال کردیم
+    let sub_cat = document.getElementById("sub_cat");
+    sub_cat.style.display = "None"; // اینجا به کمک sub_cat.style.display = "None"
+    function addProduct() {
+        {#console.log("clicked");#}
+        let name_product = document.getElementById("name_product").value;
+        let price_product = document.getElementById("price_product").value;
+        let count_product = document.getElementById("count_product").value;
+        let subcategory_product = document.getElementById("subcategory_product").value;
+
+        // console.log() نتیجه رو در کنسول inspect نمایش میده
+        console.log(name_product,price_product,count_product,subcategory_product);
+
+        // عبارت const هم مثل var  و let متغییر تعریف میکنه
+        // در اینجا ما چون میخواییم درخواست با js ارسال کنیم ، نیاز به csrftoken داریم
+        // و اینجا ما از طریق getCookie('csrftoken') کوکی مربوط به csrftoken رو دریافت کردیم
+        const csrftoken = getCookie('csrftoken');
+
+        // تا اینجا مقدمات قبل از ایجاد درخواست بود یعنی گرفتن value های مورد نظر برای ارسال
+        // از اینجا روند ajax تازه شروع میشه
+
+         // مرحله 1 نمونه گیری
+        var xhttp = new XMLHttpRequest();
+
+         // مرحله 2 تعیین کردن method در خواست و name url مقصد برای ارسال درخواست
+        xhttp.open("POST", "{% url 'add_product' %}", true);
+
+        // تنظیم کردن header درخواست
+        xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+        // در اینجا بررسی میکنیم که ، درخواست بدون هیچ مشکلی رفته و بدون هیچ مشکلی برگشته
+        // عبارت this اشاره میکنه به کلاس XMLHttpRequest() که از روی اون نمونه گیری کردیم
+        // عبارت this.readyState === 4 && this.status === 200 درخواست بدون مشکل رفته و برگشته
+
+        // این تابع زمانی اجرا میشه که اطلاعات به طور کامل به بک اند ارسال شده باشه و درجواب درخواست
+        // عبارتی از بک اند ارسال شده باشه
+        xhttp.onreadystatechange = function() {
+            if (this.readyState === 4 && this.status === 200) {
+
+                // Response
+                // در اینجا اگر مواردی که در بالا برای سلامت درخواست ذکر شده درست باشه
+                // عملیات زیر انجام میشه
+                var response = this.responseText;//در اینجا متغییر response پاسخی که از بک اند به صورت text میاد رو ذخیره میکنه
+                if (response === "add products") alert("محصول اضافه شده است");
+                console.log(response);
+                location.reload();
+
+            }
+        };
+        let d = { "test": 1 , "csrftoken": csrftoken};
+        {#xhttp.send(JSON.stringify(d));#}
+
+        //در اینجا ما اطلاعاتی که از محصول در بالا گرفتیم رو به url مورد نظر ارسال میکنیم
+        // وقتی که اطلاعاتی که ارسال کردیم درست بودند تابع بالا اجرا میشه و پیغام محصول اضافه شد رو نمایش میده
+        xhttp.send(
+            "name_product=" + name_product +
+            "&price_product=" + price_product +
+            "&count_product=" + count_product +
+            "&subcategory_product=" + subcategory_product +
+            "&csrfmiddlewaretoken="+csrftoken
+        );
+    }
+
+    // این تابع برای ما کوکی csrftoken رو دریافت میکنه
+    function getCookie(name) {
+    let cookieValue = null;// برای مقدار کوکی یک متغییر ایجاد کردیم
+
+        // دراینجا میگه که اگر کوکی وجود داشت و برابر با '' نبود ... از ';' کوکی ها رو از هم جدا کن
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+
+        // در اینجا کا یک حلقه for برای پیمایش تک تک کوکی ها ایجاد کردیم
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            // در اینجا میگیم که آیا کوکی مورد نظر نامش csrftoken هستش یا خیر
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    // این تابع رو ما در ارسال درخواست فراخوانی کردیم و از مقدار  csrftoken که به ماداده استفاده میکنیم
+    return cookieValue;
+}
+
+    function updateSubCategories(){
+
+        //دراین متغییر ما value دسته بندی رو دریافت کردیم
+        let category_product = document.getElementById("category_product").value;
+        console.log(category_product);// صرفا برای تست دریافت اطلاعات هستش
+
+        // طبق معمول چون میخواییم درخواست ارسال کنیم به csrftoken احتیاج داریم که از
+        // که برای دریافت اون از تابع grtCookie() استافده میکنیم
+        const csrftoken = getCookie('csrftoken');
+
+        // علامت $ برای jquery هستش و تمام اون مراحلی که در ajax برای رسیدن به مرحله
+        // تعیین method درخواست و url  مقصد رو انجام میده
+        // و ما در اینجا صرفا بعد از علامت $ با نقطه method درخواست رو تعیین میکنیم و در پرانتز url مقصد
+        // و در پارمتر بعدی مقداری که به بک اند میخواییم ارسال کنیم رو قرار میدیم
+        $.post("{% url 'get_subcategories' %}",
+              {
+                category_product: category_product,
+                csrfmiddlewaretoken: csrftoken
+              },
+            // کار این تایع اینه که تا زمانی که مقداری از بک اند برای ما ارسال نشده
+            // هیچ مقداری برای زیر دسته بندی نمایش نده
+              function(data, status){
+                    sub_cat.style.display = "block";
+                    let sub_cat_options = document.getElementById("subcategory_product");
+                    sub_cat_options.innerHTML = "";
+
+                    // این شرط میگه اگر طول data ارسال شده توسط بک اند صفر بود
+                  // به فیلد زیر دسته بندی اضافه که هیچ دسته بندی وجود ندارد
+                    if (data.length <= 0){
+                        var node = document.createElement("option"); // Create a <li> node
+                        var textnode = document.createTextNode("هیچ دسته بندی وجود ندارد"); // Create a text node
+                        node.appendChild(textnode);
+                        node.value = 0;
+                        let subcategory_product = document.getElementById("subcategory_product")
+                        subcategory_product.appendChild(node);
+                        return;
+                    }
+
+
+                    // این تابع jsonresponse که از بک ارسال شده رو دریافت میکنه
+                    function myFunction(item, index, arr) {
+                      console.log(arr[index].id,arr[index].name);// در کنسول آیدی و نام زیردسته بندی رو نمایش میده
+                      var node = document.createElement("option"); // Create a <li> node
+                      var textnode = document.createTextNode(arr[index].name); // Create a text node // با نام زیردسته بندی یک نوشته ایجاد میکنه
+                      node.appendChild(textnode);// نوشته بالا رو به فیلد زیردسته بندی اضافه میکنه
+                      node.value = arr[index].id;// آیدی زیر دسته بندی رو به عنوان value برای option مورد نطر قرار میده
+                      let subcategory_product = document.getElementById("subcategory_product")// فیلد مربوط به زیر دسته بندی رو پیدا کرد
+                      subcategory_product.appendChild(node);// نام و آیدی زیردسته بندی که در بالا درست کردیم رو به فیلد زیردسته بندی اضافه میکنه
+                    }
+                  data.forEach(myFunction)// میگه برای تک تک اطلاعات ارسالی از سمت بک یک بار تابع بالا رو اجرا کن
+                  // چون یک دسته بندی ممکنه چندین زیردسته بندی داشته باشه
+
+                }
+        );
+    }
+
+    function add_api_cart(id){
+            let cookie = getCookie('csrftoken')
+            $.post("{% url 'add_api_cart' %}",
+                {
+                    user_id: {{ user.id }},
+                    id_pro: id,
+                    csrfmiddlewaretoken: cookie
+
+                },
+                function(data, status){
+
+                    window.location = "{% url 'cart_home' %}";
+                    console.log(data);
+                    $("#message").toggle(1000);
+                    $("#message").hide(1000);
+
+                }
+            );
+        }
+
+    function add_api_cart2(id){
+        let http = new XMLHttpRequest();
+        const csrftoken = getCookie('csrftoken');
+        http.open("POST", "{% url 'add_api_cart' %}", true);
+        http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        http.onreadystatechange= function (){
+            if(this.readyState === 4 && this.status === 200){
+
+            {#window.location("{% url 'cart_home' %}")#}
+            {#console.log(data)#}
+            var response = this.responseText;
+            if( response === "out of num"){alert("سقف مجاز افزودن محصول به سبد خرید")}
+            location.reload();
+            }
+        }
+        http.send(
+            "&id_pro=" + id +
+            "&user_id=" + {{user.id}} +
+            "&csrfmiddlewaretoken="+csrftoken
+        );
+    }
+{#{"id_pro": id,"user_id": {{user.id}}, "csrfmiddlewaretoken": "csrftoken"}#}
+</script>
+</body>
+</html>

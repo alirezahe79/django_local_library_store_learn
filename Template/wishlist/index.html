@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block body %}
+
+ <!-- Breadcumbs start -->
+
+{#  برای پیدا کردن محتوای صفحه به جز هدر و فوتر این موارد رو سرچ کن #}
+<div class="e-breadcumb-wrap text-center">
+    <h2 class="e-breadcumb-title">علاقه مندیها</h2>
+    <ul class="e-breadcumb-kist">
+        <li>
+            <a href="index.html">خانه </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);"> صفحات </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);">علاقه مندیها </a>
+        </li>
+    </ul>
+</div>
+<!-- Product Category start -->
+<div class="e-shopcart-wrap">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="e-shopcart-sec">
+                    <div class="shopcart-table-wrap mb-30">
+                        <form class="table-responsive">
+                            <table class="shopcart-table">
+                                <thead>
+                                    <tr>
+                                    <th>محصول </th>
+                                    <th>قیمت </th>
+                                    <th>وضعیت</th>
+                                    <th>گزینه</th>
+                                    <th>&nbsp;</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for i in wish %}
+                                    <tr class="e-remove-wrap">
+                                    <td >
+                                        <div class="sc-productwrap">
+                                            <a href="product_details.html" class="sc-product-thumb">
+                                                <img src={% static "images/index1/shopcart01.jpg"%} alt="{{ i.0 }}" class="img-fluid">
+                                            </a>
+                                            <div class="sc-product-details">
+                                                <a href="#" class="sc-product-ttl">{{ i.0 }}</a>
+{#                                                <p class="sc-product-sz">اندازه: متوسط </p>#}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="sc-product-prc">{{ i.2 }}</span></td>
+                                        {% if i.1 > 0 %}
+                                    <td><span class="sc-wishlist-status stock-availble">موجود در انبار</span></td>
+                                        {% else %}
+                                        <td><span class="sc-wishlist-status stock-out">اتمام موجودی</span></td>
+                                        {% endif %}
+                                    <td>
+
+                                        <a onclick="add_api_cart2('{{ i.3 }}')" class="e-btn wishlist-ac"> افزودن به سبد </a>
+                                    </td>
+                                    <td>
+                                        <a onclick="delete_wish_api('{{ i.3 }}')" class="sc-produc-remove e-remove-product">
+                                            <img src={% static "images/index1/svg/cut.svg"%} alt="icon">
+                                        </a>
+                                    </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                                </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        // این تابع برای ما کوکی csrftoken رو دریافت میکنه
+    function getCookie(name) {
+    let cookieValue = null;// برای مقدار کوکی یک متغییر ایجاد کردیم
+
+        // دراینجا میگه که اگر کوکی وجود داشت و برابر با '' نبود ... از ';' کوکی ها رو از هم جدا کن
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+
+        // در اینجا کا یک حلقه for برای پیمایش تک تک کوکی ها ایجاد کردیم
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            // در اینجا میگیم که آیا کوکی مورد نظر نامش csrftoken هستش یا خیر
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    // این تابع رو ما در ارسال درخواست فراخوانی کردیم و از مقدار  csrftoken که به ماداده استفاده میکنیم
+    return cookieValue;
+    }
+
+    function add_api_cart2(id){
+        let http = new XMLHttpRequest();
+        const csrftoken = getCookie('csrftoken');
+        http.open("POST", "{% url 'add_api_cart' %}", true);
+        http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        http.onreadystatechange= function (){
+            if(this.readyState === 4 && this.status === 200){
+
+            {#window.location("{% url 'cart_home' %}")#}
+            {#console.log(data)#}
+            var response = this.responseText;
+            if( response === "out of num"){alert("سقف مجاز افزودن محصول به سبد خرید")}
+            location.reload();
+            }
+        }
+        http.send(
+            "&id_pro=" + id +
+            "&user_id=" + {{user.id}} +
+            "&csrfmiddlewaretoken="+csrftoken
+        );
+    }
+
+
+    function delete_wish_api(id){
+            let cookie = getCookie('csrftoken')
+            $.post("{% url 'delete_wish_api' %}",
+                {
+                    user_id: {{ user.id }},
+                    id_pro: id,
+                    csrfmiddlewaretoken: cookie
+
+                },
+                function(data, status){
+
+                    location.reload();
+                    console.log(data);
+                    {#$("#message").toggle(1000);#}
+                    {#$("#message").hide(1000);#}
+
+                }
+            );
+        }
+
+</script>
+
+{#  برای پیدا کردن محتوای صفحه به جز هدر و فوتر این موارد رو سرچ کن #}
+<!-- Newsletter start -->
+{% endblock body %}
