@@ -7,9 +7,12 @@ def GlobalModels(request):
     user = request.user
     c_count = 0
     if user and user.is_authenticated:
+        lo = 1
         c = Cart.objects.filter(id_user=user)
         for i in c:
             # در اینجا ما از رشته سبد ، آبجکت محصول رو درآوردیم تا به نام و قیمت محصول بررسیم
             c_count += i.count
             # pro_list.append([i.id_product.name, i.count, i.unit_price, i.total_price, i.id_product.id])
-    return {"cart": c_count}
+    else:
+        lo = 0
+    return {"cart": c_count, "login": lo}

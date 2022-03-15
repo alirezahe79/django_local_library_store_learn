@@ -19,9 +19,9 @@ def home(request):
             if s < n < c:
                 # در اینجا چون ما از  and  استفاده کردیم باید هردو شرط درست باشه به همین دلیل
                 # ما برابر c در elif قرار دادیم
-                list_of_product.append([i.name, i.count, i.category.name, i.price, i.id])
+                list_of_product.append([i.name, i.count, i.category.name, i.show_price, i.id])
             elif n == c:
-                list_of_product.append([i.name, i.count, i.category.name, i.price, i.id])
+                list_of_product.append([i.name, i.count, i.category.name, i.show_price, i.id])
                 break
         return render(request, "dashboard/dashboard.html", {"list": list_of_product})
     return redirect("account_login")

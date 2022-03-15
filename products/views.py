@@ -28,7 +28,7 @@ def index2(request):
 #     در اینجا ما ار فیلد deleted = False
 #     چون میخوایم محصولاتی که پاک نشدن رو بیاره تا به خطا بر نخوریم
     for i in p:
-        list_of_product.append([i.name, i.count, i.category.name, i.price, i.id])
+        list_of_product.append([i.name, i.count, i.category.name, i.show_price, i.id])
 
     cate = list(Categories.objects.all())
     # علت استفاده ار لیست اینکه خروجی all()
@@ -70,9 +70,9 @@ def index(request):
         if s < n < c:
             # در اینجا چون ما از  and  استفاده کردیم باید هردو شرط درست باشه به همین دلیل
             # ما برابر c در elif قرار دادیم
-            list_of_product.append([i.name, i.count, i.category.name, i.price, i.id])
+            list_of_product.append([i.name, i.count, i.category.name, i.show_price, i.id])
         elif n == c:
-            list_of_product.append([i.name, i.count, i.category.name, i.price, i.id])
+            list_of_product.append([i.name, i.count, i.category.name, i.show_price, i.id])
             break
 
     cate = list(Categories.objects.all())
@@ -99,7 +99,66 @@ def index(request):
 #.
 #.
 #.
-#.........................// tab Change 2 for sing products page //.............................
+#..............................// product details page view //..................................
+#.
+#.
+#.
+#...............................................................................................
+
+
+def product_details(request, subname, id_pro):
+    from .models import Products, Subcategorise
+    from MYmethod.Tamam import num_sep
+    pro_list = []
+    try:
+        id_pro = int(id_pro)
+    except (TypeError, SyntaxError, ValueError):
+        # return Http404
+        # کامنت بالا برای زمانی هستش که پروژه در هاست آپلود کردیم الان به دلیل خطا نیاز داریم
+        return HttpResponse("عدد وارد کنید")
+    try:
+        subname = str(subname)
+    except (TypeError, SyntaxError, ValueError):
+        # return Http404
+        # کامنت بالا برای زمانی هستش که پروژه در هاست آپلود کردیم الان به دلیل خطا نیاز داریم
+        return HttpResponse("مقدار نام زیر دسته بندی را به صورت رشته وارد کنید")
+
+    # در بالا بررسی کردیم که مقدار های ارسال شده برای آیدی حتما عدد
+    # و برای نام زیردسته بندی حتما رشته باشد
+
+    try:
+        p = Products.objects.get(id=id_pro)
+    except Products.DoesNotExist:
+        return HttpResponse(" محصول با آیدی " + str(id_pro) + " یافت نشد ")
+
+    # ..............................// comment //..............................
+    # در اینجا چون از متد get استفاده کردیم دیگه نیازی به
+    # لیست و حلقه for نیست و به همین دلیل ما مستقیما مقدار pرو
+    # به عنوان context به قالب ارسال میکنیم
+    # pro_list.append([p.name, p.count, p.category.name, p.show_price, p.id, p.product_text])
+    # ..............................// comment //..............................
+
+    try:
+        sub_cat = Subcategorise.objects.get(name=subname)
+    except Subcategorise.DoesNotExist:
+        return HttpResponse(" زیردسته بندی با نام " + str(subname) + " یافت نشد ")
+
+    # در اینجا ما براساس دسته بندی محصول محصولات با زیرسته بندی مشابه نمایش میدیم
+    sub = Products.objects.filter(category=sub_cat)
+    for i in sub:
+        if i.id != id_pro:
+            pro_list.append([i.name, i.count, i.category.name, i.show_price, i.id])
+
+    for i2 in pro_list:
+        print("*")
+    return render(request, "product/product_details.html", {"p": p, "list": pro_list})
+
+
+#...............................................................................................
+#.
+#.
+#.
+#.........................// tab Change 2 for single products page //.............................
 #.
 #.
 #.
@@ -119,11 +178,18 @@ def TabProducts2(req, page):
     try:
         num = int(page)
     except (ValueError, TypeError, SyntaxError):
-        return HttpResponse("عدد وارد کنید")
+        return redirect("products_home")
+        # return HttpResponse("عدد وارد کنید")
 
     # در اینجا با متغییر n_page تعداد نمایش گزینه هایصفحه رو کنترل میکنیم
     max = list(Products.objects.all())
     max = (len(max) // 10) + 1
+
+    # این شرط چک میکنه اگر عدد صفحه بالا از max بود دیگه به صفحه بعدی نره
+    # و دوباره همون صفحه آخر براش لود بشه
+    if page > max:
+        num = max
+        page = max
     n_page = list(range(1, max+1, 1))
 
     # اگر آیدی وارد شده یک بود از محصول 1 تا 10 رو از حلقه for در
@@ -165,9 +231,9 @@ def TabProducts2(req, page):
         if s < n < c:
             # در اینجا چون ما از  and  استفاده کردیم باید هردو شرط درست باشه به همین دلیل
             # ما برابر c در elif قرار دادیم
-            listPro.append([i.name, i.count, i.category.name, i.price, i.id])
+            listPro.append([i.name, i.count, i.category.name, i.show_price, i.id])
         elif n == c:
-            listPro.append([i.name, i.count, i.category.name, i.price, i.id])
+            listPro.append([i.name, i.count, i.category.name, i.show_price, i.id])
             break
     return render(req, 'product/product.html', {"list": listPro, "page": n_page, "befor": befor,
                                                 "after": after, "loc_page": page, "max": max})
@@ -198,12 +264,14 @@ def TabProducts(req, namemain, subname, page):
         for i in cat:
             x = i.id
     except Categories.DoesNotExist:
-        return HttpResponse("دسته بندی وجود ندارد")
+        return redirect("products_home")
+        # return HttpResponse("دسته بندی وجود ندارد")
 
     try:
         sub = Subcategorise.objects.get(name=subname)
     except Subcategorise.DoesNotExist:
-        return HttpResponse("زیر دسته بندی وجود ندارد")
+        return redirect("products_home")
+        # return HttpResponse("زیر دسته بندی وجود ندارد")
 
     # آیدی دسته بندی و زیر دسته بندی رو بدست آرودیم
     # میتونیم برای بهتر شده کار در صورتی که دسته بندی یا زیردسته بندی وجود نداشت
@@ -213,11 +281,18 @@ def TabProducts(req, namemain, subname, page):
     try:
         num = int(page)
     except (ValueError, TypeError, SyntaxError):
-        return HttpResponse("عدد وارد کنید")
+        return redirect("products_home")
+        # return HttpResponse("عدد وارد کنید")
 
     # در اینجا با متغییر n_page تعداد نمایش گزینه هایصفحه رو کنترل میکنیم
     max = list(Products.objects.all())
     max = (len(max) // 10) + 1
+
+    # این شرط چک میکنه اگر عدد صفحه بالا از max بود دیگه به صفحه بعدی نره
+    # و دوباره همون صفحه آخر براش لود بشه
+    if page > max:
+        num = max
+        page = max
     n_page = list(range(1, max + 1, 1))
 
     # اگر آیدی وارد شده یک بود از محصول 1 تا 10 رو از حلقه for در
@@ -245,9 +320,9 @@ def TabProducts(req, namemain, subname, page):
         if s < n < c:
             # در اینجا چون ما از  and  استفاده کردیم باید هردو شرط درست باشه به همین دلیل
             # ما برابر c در elif قرار دادیم
-            listPro.append([i.name, i.count, i.category.name, i.price, i.id])
+            listPro.append([i.name, i.count, i.category.name, i.show_price, i.id])
         elif n == c:
-            listPro.append([i.name, i.count, i.category.name, i.price, i.id])
+            listPro.append([i.name, i.count, i.category.name, i.show_price, i.id])
             break
     return render(req, 'product/product.html', {"list": listPro, "page": n_page, "befor": befor,
                                                 "after": after, "loc_page": page, "max": max})
@@ -335,6 +410,7 @@ def delete(request, id_cat=None):
 def add(request):
     if request.method == "POST":
         from .models import Products, Categories, Subcategorise
+        from Tamam import num_sep
 
         name_product = request.POST.get("name_product", False)
         price_product = request.POST.get("price_product", False)
@@ -359,6 +435,7 @@ def add(request):
                 p.count = int(count_product)
             except (ValueError, TypeError, SyntaxError):
                 return redirect("product")
+            p.show_price = num_sep(p.price)
             p.category = s_c
             p.save()
             return HttpResponse("محصول " + name_product + " با موفقیت اضافه شد")
@@ -381,6 +458,7 @@ def edit(request, id_pro=None):
     if not request.user.is_superuser:
         return Http404
     from .models import Products, Subcategorise
+    from Tamam import num_sep
 
     if request.method == "POST":
 
@@ -413,6 +491,7 @@ def edit(request, id_pro=None):
                     p.count = int(count_product)
                 except (ValueError, TypeError, SyntaxError):
                     return redirect("product")
+                p.show_price = num_sep(p.price)
                 p.category = s_c
                 p.save()
                 return redirect("products_home")
@@ -426,7 +505,7 @@ def edit(request, id_pro=None):
             if len(p) == 1:
                 list_of_product = []
                 for i in p:
-                    list_of_product.append([i.name, i.count, i.price, i.category.name, i.id])
+                    list_of_product.append([i.name, i.count, i.show_price, i.category.name, i.id])
 
                 return render(request, "product/edit.html", {"list": list_of_product})
     raise Http404("محصول یافت نشد")
@@ -480,3 +559,50 @@ def get_subcategories(request):
 def test(request):
     return render(request, "base.html")
 
+
+#...........................................................................................
+#.
+#.
+#.
+#..................// this function import Thousand seprator  //............................
+#.
+#.
+#.
+#...........................................................................................
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def number_seprator(request):
+    from .models import Products
+    import locale
+    locale.setlocale(locale.LC_ALL, '')  # Use '' for auto, or force e.g. to 'en_US.UTF-8'
+
+    # ............................// for host //..............................
+    # import locale
+    # locale.setlocale(locale.LC_ALL, 'en_US')
+    # 'en_US'
+    # ............................// for host //..............................
+
+    p = Products.objects.filter(deleted=False)
+    for i in p:
+        id_pro = i.id
+        value = i.price
+        value = f'{value:n}'  # For Python ≥3.6
+
+        # ............................// for host //..............................
+        # value = locale.format("%d", value, grouping=True)
+        # ............................// for host //..............................
+
+        try:
+            pro = Products.objects.get(id=id_pro)
+            pro.show_price = value
+            pro.save()
+        except Products.DoesNotExist:
+            return HttpResponse(" محصول با آیدی " + str(id_pro) + " یافت نشد ")
+    return HttpResponse("همشون حل شد حاجی")
+
+# ..............................// comment //..............................
+# این تابع فقط در دسترس super user ها هستش
+# و با در خواست دادن به اون تمام show_price ها رو
+# به قیمت جدید آپدیت میکنه
+# ..............................// comment //..............................

@@ -30,4 +30,6 @@ urlpatterns = [
     path('base/', views.test, name="base"),
     path('<str:namemain>/<str:subname>/<int:page>', views.TabProducts, name="tabviewname"),
     path('<int:page>', views.TabProducts2, name="tabviewname2"),
+    path('number_sep2022', views.number_seprator, name="number_seprator"),
+    path('<str:subname>/<int:id_pro>', views.product_details, name="product_details"),
 ]

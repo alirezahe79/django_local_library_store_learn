@@ -1,13 +1,22 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block body %}
+    {% block css %}
+        <!--suppress CssInvalidPropertyValue -->
+        <style>
+        .quantity{
+                background: rgba(111,000,000,0)
+        }
+        </style>
+        {% endblock css %}
         <!-- Breadcumbs start -->
 
 {#  برای پیدا کردن محتوای صفحه به جز هدر و فوتر این موارد رو سرچ کن #}
 
 {#    اگر میخوایید محصولی به طور رایگان قرار بدین در سایت باید شرط  #}
 {#    حلقه for رو علاوه بر وجود مقدار برای total price باید بر وجود مقدار برای pro هم قرار بدین #}
-<div class="e-breadcumb-wrap text-center">
+<!--suppress CssInvalidPropertyValue -->
+    <div class="e-breadcumb-wrap text-center">
         <h2 class="e-breadcumb-title">سبد خرید </h2>
         <ul class="e-breadcumb-kist">
             <li>
@@ -24,7 +33,7 @@
     <!-- Product Category start -->
     <section class="e-shopcart-wrap">
         <div class="container">
-        {% if total_price %}
+        {% if show_sabad %}
             <div class="row">
                 <div class="col-xl-9 col-lg-12">
                     <div class="e-shopcart-sec">
@@ -46,18 +55,21 @@
                                     <tr>
                                         <td>
                                             <div class="sc-productwrap">
-                                                <a href="product_details.html" class="sc-product-thumb">
+                                                {# در ایناج ترتیب قرار گیری آیدی و نام زیردسته بندی رو برعکس گذاشتیم چون نام زیر دسته بندی فارسی وارد شده و به همبن دلیل #}
+                                            {# مثل حالت انگلیسی نمی توان به ترتیب وارد کرد در url #}
+                                            {# پس اگر نام انگلیسی بود می توان به حالتی که در url تعریف  کردیم قرار بدیم #}
+                                                <a href="{% url 'product_details' i.5 i.4  %}" class="sc-product-thumb">
                                                     <img src={% static "images/index1/shopcart01.jpg"%} alt={{ i.0 }} class="img-fluid">
                                                 </a>
                                                 <div class="sc-product-details">
-                                                    <a href="{% url 'products_home' %}" class="sc-product-ttl">{{ i.0}}</a>
+                                                    <a href="{% url 'product_details' i.5 i.4  %}" class="sc-product-ttl">{{ i.0}}</a>
 {#                                                    <p class="sc-product-sz">اندازه: متوسط </p>#}
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="quantity-box">
-                                                <input type="text" class="quantity" value="{{ i.1 }}" style="width: 50%">
+                                                <input type="text" class="quantity" value="{{ i.1 }}" readonly>
                                                 <span class="quantity-minus pa-sub quantity-icon" value="{{ i.4 }}" onclick="delete_cart_num('{{ i.4 }}')"> - </span>
                                                 <span class="quantity-plus  pa-add quantity-icon" value="{{ i.4 }}" onclick="add_api_cart2('{{ i.4 }}')"> + </span>
                                             </div>
@@ -141,7 +153,7 @@
 {#                                </ul>#}
 {#                            </div>#}
                         </div>
-                    {% if total_price %}
+                    {% if show_sabad %}
                         <a href="shipping_cart.html" class="e-btn">پرداخت صورتحساب </a>
                     {% endif %}
                     </div>
@@ -212,7 +224,7 @@
             {#console.log(data)#}
             var response = this.responseText;
             if( response === "out of num"){alert("سقف مجاز افزودن محصول به سبد خرید")}
-            location.reload();
+            window.location.href = window.location.href ;
             }
         }
         http.send(

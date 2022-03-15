@@ -20,4 +20,6 @@ class Products(models.Model):
     category = models.ForeignKey(Subcategorise, verbose_name="نام دسته بندی", on_delete=models.CASCADE)
     count = models.PositiveIntegerField(default=0, blank=True, verbose_name="تعداد محصول")
     price = models.PositiveIntegerField(verbose_name="قیمت محصول")
+    show_price = models.CharField(default="0", blank=True, max_length=50, verbose_name="قیمت نمایشی")
+    product_text = models.TextField(default="توضیح محصول را وارد نمایید", blank=True, verbose_name="توضیح محصول")
     deleted = models.BooleanField(default=False, blank=True, verbose_name="محصول حذف شده")

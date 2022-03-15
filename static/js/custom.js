@@ -1,3 +1,5 @@
+// noinspection JSAnnotator
+
 /*--------------------- Copyright (c) 2021 -----------------------
 [Master Javascript]
 Project: Shopmartio - Responsive HTML Template 

@@ -28,7 +28,7 @@ def WishListView(req):
             print("user_id bug")
             return JsonResponse(pro_dict, json_dumps_params={'ensure_ascii': False}, safe=True)
 
-        from cart.models import Products
+        from products.models import Products
         from .models import WishList
 
         try:
@@ -68,12 +68,15 @@ def WishListView(req):
 @login_required(login_url="/account/login")
 def WishListpageView(request):
     from .models import WishList
+    from MYmethod.Tamam import num_sep
+
     user = request.user
     wish = WishList.objects.filter(id_user=user)
     pro_list = []
     for i in wish:
+        show_price = num_sep(i.unit_price)
         # برای نمایش بخش وضعیت موجودی محمول ما در اطلاعات ارسالی به قالب موجودی محصول رو هم ارسال میکنیم
-        pro_list.append([i.id_product.name, i.id_product.count, i.unit_price, i.id_product.id])
+        pro_list.append([i.id_product.name, i.id_product.count, show_price, i.id_product.id, i.id_product.category.name])
     return render(request, "wishlist/index.html", {"wish": pro_list})
 
 

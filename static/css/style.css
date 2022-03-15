@@ -674,7 +674,7 @@
 [Master Stylesheet] 
 Project: Shopmartio - Responsive HTML Template 
 Version: 1.0.0 
-Author: Kamleshyadav
+Author: mehrshad heydari
  ------------------------------------------------------------------- 
 [Table of contents] 
     1. Global CSS Start
@@ -2463,7 +2463,7 @@ body.open-cart .main-wrapper:not(.sb-cartbox) {
     box-shadow: inset 0 0 0 35px var(--white-color);
     -webkit-transform: scale3d(0.9, 0.9, 1);
     transform: scale3d(0.9, 0.9, 1);
-    -webkit-transition: box-shadow 0.3s, -webkit-transform 0.3;
+    -webkit-transition: box-shadow 0.3s, -webkit-transform 0.3s;
     transition: box-shadow 0.3s, transform 0.3s;
 }
 .c-social-list > li > a:hover::after {

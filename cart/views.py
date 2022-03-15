@@ -18,6 +18,7 @@ from django.contrib.auth.decorators import login_required
 @login_required(login_url="/account/login")
 def index(request):
     from .models import Cart
+    from MYmethod.Tamam import num_sep
 
     user = request.user
     # اینجا میریم برای گرفتن سبد تمام محصولات کاربر با آیدی موردنظر
@@ -27,10 +28,32 @@ def index(request):
     pro_list = []
     total_price = 0
     for i in cart:
+        # علت انجام این کار اینکه که اگر قیمت تغییر کرده باشه و نمایش اونو
+        # یادمون رفته باشه تغییر بدیم برای کاربر قیمت درست رو نمایش میده
+        show_price = num_sep(i.id_product.price)
+        show_total = num_sep(i.total_price)
+
+        # ..............................// comment //..............................
+        # در اینجا ما برای نمایش اعداد به طور دلخواه موارد قبلی را برداشته
+        # و جایگزین موارد جدید کردیم
+        # و این تغییر صرفا ظاهری بوده و در ساختار سبد خرید هیچ تغییری ندادیم
         # در اینجا ما از رشته سبد ، آبجکت محصول رو درآوردیم تا به نام و قیمت محصول بررسیم
-        pro_list.append([i.id_product.name, i.count, i.unit_price, i.total_price, i.id_product.id])
+
+        #  در اینجا ما برای اینکه که به نام زیردسته بندی برسیم i.id_product.category.name استفاده کردیم
+        # ..............................// comment //..............................
+
+        pro_list.append([i.id_product.name, i.count, show_price, show_total, i.id_product.id, i.id_product.category.name])
+        # pro_list.append([i.id_product.name, i.count, i.unit_price, i.total_price, i.id_product.id])
         total_price += i.total_price
-    return render(request, "cart/index.html", {"pro": pro_list, "total_price": total_price})
+
+    # ..............................// comment //..............................
+
+    # در پایان بدنه for قیمت نهایی رو به عدد با جدا کننده تبدیل میکنم
+
+    # ..............................// comment //..............................
+    gheymat = total_price
+    total_price = num_sep(total_price)
+    return render(request, "cart/index.html", {"pro": pro_list, "total_price": total_price, "show_sabad": gheymat})
 
 
 #...............................................................................................
@@ -91,9 +114,6 @@ def add_cart(request, id_pro=None):
         if p.count > 0:
             c.id_product = p
             c.count += 1
-            # p.count -= 1
-            # یدونه از موجودی محصول کم میکنیم
-            # p.save()
             c.unit_price = p.price
             c.total_price += c.unit_price
             # برای جمع کردن قیمت مجموع محصول که اگر اولین محصول باشه
@@ -156,11 +176,9 @@ def add_api_cart(req):
             try:
                 user = User.objects.get(id=user_id)
             except User.DoesNotExist:
-                print("User.DoesNotExist")
                 return JsonResponse(pro_dict, json_dumps_params={'ensure_ascii': False}, safe=True)
 
         else:
-            print("user_id bug")
             return JsonResponse(pro_dict, json_dumps_params={'ensure_ascii': False}, safe=True)
 
         from products.models import Products

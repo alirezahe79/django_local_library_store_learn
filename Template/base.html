@@ -110,10 +110,12 @@ Purchase:
 {#                        </li>#}
                         <li><a href="profile.html">حساب کاربری </a></li>
                         <li><a href="{% url 'wishlist_home' %}">لیست علاقه مندیها </a></li>
+                        {% if login == 0 %}
                         <li>
                             <a href="{% url 'account_register' %}">ثبت نام </a> یا
                             <a href="{% url 'account_login' %}">ورود </a>
                         </li>
+                        {% endif %}
                         <!-- pop up login and register -->
 {#                        <li>#}
 {#                            <a href="javascript:void(0);" data-toggle="modal" data-target="#register">ثبت نام </a> یا#}

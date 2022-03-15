@@ -42,11 +42,14 @@
                                     <tr class="e-remove-wrap">
                                     <td >
                                         <div class="sc-productwrap">
-                                            <a href="product_details.html" class="sc-product-thumb">
+                                            {# در ایناج ترتیب قرار گیری آیدی و نام زیردسته بندی رو برعکس گذاشتیم چون نام زیر دسته بندی فارسی وارد شده و به همبن دلیل #}
+                                            {# مثل حالت انگلیسی نمی توان به ترتیب وارد کرد در url #}
+                                            {# پس اگر نام انگلیسی بود می توان به حالتی که در url تعریف  کردیم قرار بدیم #}
+                                            <a href="{% url 'product_details' i.4 i.3  %}" class="sc-product-thumb">
                                                 <img src={% static "images/index1/shopcart01.jpg"%} alt="{{ i.0 }}" class="img-fluid">
                                             </a>
                                             <div class="sc-product-details">
-                                                <a href="#" class="sc-product-ttl">{{ i.0 }}</a>
+                                                <a href="{% url 'product_details' i.4 i.3  %}" class="sc-product-ttl">{{ i.0 }}</a>
 {#                                                <p class="sc-product-sz">اندازه: متوسط </p>#}
                                             </div>
                                         </div>
@@ -114,6 +117,7 @@
             {#console.log(data)#}
             var response = this.responseText;
             if( response === "out of num"){alert("سقف مجاز افزودن محصول به سبد خرید")}
+            else{alert("محصول با موفقیت به سبد شما افزوده شد")}
             location.reload();
             }
         }
