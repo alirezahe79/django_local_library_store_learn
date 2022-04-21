@@ -154,7 +154,7 @@
 {#                            </div>#}
                         </div>
                     {% if show_sabad %}
-                        <a href="shipping_cart.html" class="e-btn">پرداخت صورتحساب </a>
+                        <a id="payment" class="e-btn">پرداخت صورتحساب </a>
                     {% endif %}
                     </div>
                 </div>
@@ -293,7 +293,28 @@
                 }
             );
         }
+        function send_payment(){
+        console.log("test")
+            let cookie = getCookie('csrftoken');
+            $.post("{% url 'request_payment' %}",
+                {
+                    amount: "{{ show_sabad }}",
+                    csrfmiddlewaretoken: cookie
 
+                },
+                function(data, status){
+
+                    {#location.reload();#}
+                    console.log(data);
+                    window.location = "https://www.zarinpal.com/pg/StartPay/"+ data.authority;
+                    {#$("#message").toggle(1000);#}
+                    {#$("#message").hide(1000);#}
+
+                }
+            );
+        }
+        let pay_btn = document.getElementById("payment");
+        pay_btn.addEventListener("click", send_payment);
         function refresh_cart(){
         location.reload()
         }
