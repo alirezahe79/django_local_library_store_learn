@@ -115,6 +115,11 @@ Purchase:
                             <a href="{% url 'account_login' %}">ورود </a>
                         </li>
                         {% endif %}
+                            {% if login == 1 %}
+                                <li>
+                            <a href="{% url 'account_logout' %}"> خروج از حساب کاربری </a>
+                                </li>
+                                {% endif %}
                         <!-- pop up login and register -->
 {#                        <li>#}
 {#                            <a href="javascript:void(0);" data-toggle="modal" data-target="#register">ثبت نام </a> یا#}
@@ -467,13 +472,17 @@ Purchase:
                                     <option value="4">اوجی</option>
                                 </select>
                             </li>
-                            <li>
-                                <select>
-                                    <option >دسته بندی</option>
-                                    <option value="1">زنانه</option>
-                                    <option value="2">مردانه</option>
-                                    <option value="3">بچگانه</option>
-                                </select>
+                            <li><div class="ht-right">
+                <div class="ht-right_info">
+                    <ul class="ht-info-list">
+
+                                    <ul >دسته بندی</ul>
+                                    {% for a in c_name %}
+                                     <li> <a href="{% url 'product_cat' a.0  %}"> {{ a.0 }} </a> </li>
+                                    {% endfor %}
+
+                    </ul>
+                </div>
                             </li>
                             <li class="Category-grid-btn">
                                 <a href="javascript:void(0);" class="active">
@@ -583,26 +592,50 @@ Purchase:
                 </div>
                 <div class="e-pagination-wrap mt-10">
                     <ul class="e-pagination justify-content-center e-line">
-                    {% if loc_page == 1 %}
-                        <li class="e-page-item disabled"><a class="e-btn light" href="{% url 'tabviewname2' befor %}" style="display: none">قبلی </a></li>
-                        {% else %}
-                        <li class="e-page-item disabled"><a class="e-btn light" href="{% url 'tabviewname2' befor %}">قبلی </a></li>
-                    {% endif %}
-                        {% for n in page %}
-                            {% if n == loc_page %}
-                        <li class="e-page-item"><a class="active e-btn light" href="{% url 'tabviewname2' n %}">{{ n }}</a></li>
+                    {% if subi %}
+                        {% if loc_page == 1 %}
+                            <li class="e-page-item disabled"><a class="e-btn light" href="{% url 'tabviewname' namecat befor %}" style="display: none">قبلی </a></li>
                             {% else %}
-                            <li class="e-page-item"><a class="e-btn light" href="{% url 'tabviewname2' n %}">{{ n }}</a></li>
-                            {% endif %}
-                        {% endfor %}
-{#                        <li class="e-page-item"><a class="e-btn light" href="javascript:void(0);">02</a></li>#}
-{#                        <li class="e-page-item"><a class="e-btn light pointer-events-none" href="javascript:void(0);">...</a></li>#}
-{#                        <li class="e-page-item"><a class="e-btn light" href="javascript:void(0);">08</a></li>#}
-{#                        <li class="e-page-item"><a class="e-btn light" href="javascript:void(0);">09</a></li>#}
-                    {% if loc_page == max %}
-                        <li class="e-page-item"><a class="e-btn light" href="{% url 'tabviewname2' after %}" style="display: none">بعدی </a></li>
-                        {% else %}
-                        <li class="e-page-item"><a class="e-btn light" href="{% url 'tabviewname2' after %}">بعدی </a></li>
+                            <li class="e-page-item disabled"><a class="e-btn light" href="{% url 'tabviewname' namecat befor %}">قبلی </a></li>
+                        {% endif %}
+                            {% for n in page %}
+                                {% if n == loc_page %}
+                            <li class="e-page-item"><a class="active e-btn light" href="{% url 'tabviewname' namecat n %}">{{ n }}</a></li>
+                                {% else %}
+                                <li class="e-page-item"><a class="e-btn light" href="{% url 'tabviewname' namecat n %}">{{ n }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+    {#                        <li class="e-page-item"><a class="e-btn light" href="javascript:void(0);">02</a></li>#}
+    {#                        <li class="e-page-item"><a class="e-btn light pointer-events-none" href="javascript:void(0);">...</a></li>#}
+    {#                        <li class="e-page-item"><a class="e-btn light" href="javascript:void(0);">08</a></li>#}
+    {#                        <li class="e-page-item"><a class="e-btn light" href="javascript:void(0);">09</a></li>#}
+                        {% if loc_page == max %}
+                            <li class="e-page-item"><a class="e-btn light" href="{% url 'tabviewname' namecat after %}" style="display: none">بعدی </a></li>
+                            {% else %}
+                            <li class="e-page-item"><a class="e-btn light" href="{% url 'tabviewname' namecat after %}">بعدی </a></li>
+                        {% endif %}
+                    {% else %}
+                        {% if loc_page == 1 %}
+                            <li class="e-page-item disabled"><a class="e-btn light" href="{% url 'tabviewname2' befor %}" style="display: none">قبلی </a></li>
+                            {% else %}
+                            <li class="e-page-item disabled"><a class="e-btn light" href="{% url 'tabviewname2' befor %}">قبلی </a></li>
+                        {% endif %}
+                            {% for n in page %}
+                                {% if n == loc_page %}
+                            <li class="e-page-item"><a class="active e-btn light" href="{% url 'tabviewname2' n %}">{{ n }}</a></li>
+                                {% else %}
+                                <li class="e-page-item"><a class="e-btn light" href="{% url 'tabviewname2' n %}">{{ n }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+    {#                        <li class="e-page-item"><a class="e-btn light" href="javascript:void(0);">02</a></li>#}
+    {#                        <li class="e-page-item"><a class="e-btn light pointer-events-none" href="javascript:void(0);">...</a></li>#}
+    {#                        <li class="e-page-item"><a class="e-btn light" href="javascript:void(0);">08</a></li>#}
+    {#                        <li class="e-page-item"><a class="e-btn light" href="javascript:void(0);">09</a></li>#}
+                        {% if loc_page == max %}
+                            <li class="e-page-item"><a class="e-btn light" href="{% url 'tabviewname2' after %}" style="display: none">بعدی </a></li>
+                            {% else %}
+                            <li class="e-page-item"><a class="e-btn light" href="{% url 'tabviewname2' after %}">بعدی </a></li>
+                        {% endif %}
                     {% endif %}
                         </ul>
                 </div>        

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+{% load static  %}
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href={% static "/css/bootstrap.min.css"%}>
+        <link rel="stylesheet" href={% static "/css/nice-select.css"%}>
+        <link rel="stylesheet" href={% static "/css/font.css"%}>
+        <link rel="stylesheet" href={% static "/css/swiper-bundle.min.css"%}>
+        <link rel="stylesheet" href={% static "/css/comman.css"%}>
+        <link rel="stylesheet" href={% static "/css/style.css"%}>
+        <!-- Favicon Link -->
+        <link rel="shortcut icon" type="image/png" href={% static "/images/index1/favicon.png"%}>
+        <style>
+            .row{
+                margin: 0 auto 0;
+                padding: 15px;
+            }
+            .modal-inner-box{
+                margin-top: 35px;
+                padding-top: 35px;
+                padding-bottom: 15px;
+                background-color: #e9e9e9;
+                border-radius: 15px;
+            }
+            .inner_row{
+                margin-left: 25px;
+                margin-right: 25px;
+            }
+            .modal-body{
+                margin: 0 auto 0;
+                width: 700px;
+            }
+            .required{
+                padding-top: 5px;
+                padding-bottom: 5px;
+            }
+            .e-rememberforgot-list{
+                padding-top: 15px;
+            }
+            #dive{
+                padding-top: 15px;
+            }
+        </style>
+        <title>ورود</title>
+    </head>
+    <body>
+        <div class="modal-content">        
+            <!-- Modal body -->
+            <div class="modal-body">
+            <div class="modal-inner">
+                <div class="row">
+                    <div class="inner-row">
+                    <div class="col-md-12">
+                        <div class="modal-inner-box">
+                            <div class="autho-model-header text-center">
+                                <a href="javascript:void(0);"><img src={% static "/images/index1/big_logo.png"%} alt="logo" class="img-fluid"></a>
+                                <p></p><br />
+                                <h2 class="autho-model-ttl">ورود </h2>
+                            </div>
+                            
+                            <div class="autho-model-filed">
+                                <form action="{% url 'account_login' %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="row">
+{#                                        {% for field in form.visible_fields %}#}
+                                        <div class="col-md-12" id="dive">
+                                            {{form.non_field_errors}}
+                                            {{ form.as_p }}
+                                            {{ from.errors }}
+{#                                            {% if form.error %}#}
+{#                                            {{ from.errors }}#}
+{#                                            {% endif %}#}
+{#                                            {{ feild.errors}}#}
+{#                                            {{ field.label_tag }}#}
+{#                                            {{ field }}#}
+                                        </div>
+{#                                        {% endfor %}#}
+                                        <div class="col-md-12">
+                                            <div class="e-form-field mb-20">
+                                                <ul class="e-rememberforgot-list">
+                                                    <li>
+                                                        <div class="e-checkbox-wrap">
+                                                            <input class="e-checkbox-input" type="checkbox" id="remember_me">
+                                                            <label for="remember_me" class="e-checkbox">مرا به خاطر بسپار </label>
+                                                        </div>
+                                                    </li>
+                                                    <li><a href={% url 'reset_password' %} class="e-comn-link" >فراموشی رمز عبور؟ </a></li>
+                                                </ul>                                            
+                                            </div>
+                                        </div> 
+                                        <div class="col-md-12">                                       
+                                            <div class="">
+                                                <button type="submit" class="e-btn">ورود </button>
+                                                 <ul class="e-rememberforgot-list" style="float: left; margin-top: 15px;">
+                                                     <li><a class="e-comn-link"  href={% url "account_register" %}> برای ایجاد حساب کابری کلیک کنید </a> </li>
+{#                                                     <li><a class="e-comn-link"  href={% url "account_logout" %}>  خروج  </a> </li>#}
+                                                 </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>            
+            </div>
+            {% if error %}
+            <button  class="e-btn" style="background-color: red!important;color: yellow!important;width: 150px;border-radius: 8px;margin: 0 auto 15px;"> {{ error }} </button>
+            {% endif %}
+        </div>
+    </body>

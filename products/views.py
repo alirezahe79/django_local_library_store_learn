@@ -77,6 +77,13 @@ def index(request):
 
     cate = list(Categories.objects.all())
 
+    # ....................................
+    cate1 = Categories.objects.all()
+    c_name = []
+    for a in cate1:
+        c_name.append([a.name])
+    # ....................................
+
     max = list(Products.objects.all())
     max = (len(max) // 10) + 1
     n_page = list(range(1, max + 1, 1))
@@ -92,7 +99,7 @@ def index(request):
         # c.append({"id": i.id, "name":i.name})
 
     return render(request, "product/product.html", {"list": list_of_product, "category": c, "page": n_page,
-                                                    "befor": befor, "after": after, "loc_page": 1, "max": max})
+                                                    "befor": befor, "after": after, "loc_page": 1, "max": max, "c_name": c_name})
 
 
 #...............................................................................................
@@ -225,6 +232,14 @@ def TabProducts2(req, page):
     pro = Products.objects.all()
 
     # متغییر n برای ما شمارش تعداد حلقه رو بر عهده میگیره
+
+    # ....................................
+    cate1 = Categories.objects.all()
+    c_name = []
+    for a in cate1:
+        c_name.append([a.name])
+    # ....................................
+
     n = 0
     for i in pro:
         n += 1
@@ -236,7 +251,91 @@ def TabProducts2(req, page):
             listPro.append([i.name, i.count, i.category.name, i.show_price, i.id])
             break
     return render(req, 'product/product.html', {"list": listPro, "page": n_page, "befor": befor,
-                                                "after": after, "loc_page": page, "max": max})
+                                                "after": after, "loc_page": page, "max": max, "c_name": c_name})
+
+
+#...............................................................................................
+#.
+#.
+#.
+#............................// User products page for categories //..............................
+#.
+#.
+#.
+#...............................................................................................
+
+
+@login_required(login_url="/account/login")
+def index_cat(request, namemain):
+    from .models import Categories, Products, Subcategorise
+    c = 10
+    s = 0
+    n = 0
+    try:
+        # ..............................// comment //..............................
+        #.
+        # در اینجا ما میام با نام دسته بندی یه رسته از اون دسته بندی
+        #  از دیتابیس دریافت میکنیم
+        #.
+        # ..............................// comment //..............................
+
+        c_P = Categories.objects.get(name=namemain)
+    except Categories.DoesNotExist:
+        return HttpResponse(f" دسته بندی به نام  {namemain} وجود ندارد ")
+
+    # ..............................// comment //..............................
+    #.
+    # دراینجا تمام زیر دسته های دسته بندی مورد نظر رو میکریم و داخل حلقه for
+    # قرار میدیم تا به تک تک زیر دسته ها و محصولاتشون دسترسی داشته باشیم
+    #.
+    # ..............................// comment //..............................
+
+    s_p = Subcategorise.objects.filter(parent=c_P)
+    pro_list = []
+    for i in s_p:
+        p = Products.objects.filter(deleted=False, category=i)
+        for m in p:
+            n += 1
+            if s < n < c:
+                pro_list.append([m.name, m.count, m.category.name, m.show_price, m.id])
+            elif n == c:
+                pro_list.append([m.name, m.count, m.category.name, m.show_price, m.id])
+                break
+
+    # ..............................// important PART //..............................
+    #.
+    # این حلقه برای دریافت تعداد کامل محصولات دسته بندی هستش و
+    #  از اون برای صفحه بندی استفاده میکنیم
+    m_c = 0
+    sub = Subcategorise.objects.filter(parent=c_P)
+    for i in sub:
+        p = Products.objects.filter(category=i)
+        for m in p:
+            m_c += 1
+    # ..............................// important PART //..............................
+    #.
+    # اینجا ما نام تمام دسته بندی ها رو برای نمایش در قالب دریافت میکنیم
+
+    cate1 = Categories.objects.all()
+    c_name = []
+    for a in cate1:
+        c_name.append([a.name])
+
+    # ....................................
+
+    cate = list(Categories.objects.all())
+    max = m_c
+    max = (max // 10) + 1
+    n_page = list(range(1, max + 1, 1))
+    befor = 1
+    after = 2
+    c = []
+    subi = 1
+    for i in cate:
+        c.append([i.id, i.name])
+    return render(request, "product/product.html", {"list": pro_list, "category": c, "page": n_page,
+                                                    "befor": befor, "after": after, "loc_page": 1, "max": max,
+                                                    "c_name": c_name, "subi": subi, "namecat": namemain})
 
 
 #...........................................................................................
@@ -250,7 +349,7 @@ def TabProducts2(req, page):
 #...........................................................................................
 
 
-def TabProducts(req, namemain, subname, page):
+def TabProducts(req, namemain, page):
     from .models import Products, Subcategorise
 
     # ابن تابع برای زمانی که برای زیردستهبندی ها نمایش متفاوتی داشتند استفاده میشه
@@ -260,18 +359,18 @@ def TabProducts(req, namemain, subname, page):
     #
     from .models import Categories
     try:
+        # ..............................// comment //..............................
+        # .
+        # در اینجا ما میام با نام دسته بندی یه رسته از اون دسته بندی
+        #  از دیتابیس دریافت میکنیم
+        # .
+        # ..............................// comment //..............................
+
         cat = Categories.objects.get(name=namemain)
-        for i in cat:
-            x = i.id
+        x = cat.id
     except Categories.DoesNotExist:
         return redirect("products_home")
         # return HttpResponse("دسته بندی وجود ندارد")
-
-    try:
-        sub = Subcategorise.objects.get(name=subname)
-    except Subcategorise.DoesNotExist:
-        return redirect("products_home")
-        # return HttpResponse("زیر دسته بندی وجود ندارد")
 
     # آیدی دسته بندی و زیر دسته بندی رو بدست آرودیم
     # میتونیم برای بهتر شده کار در صورتی که دسته بندی یا زیردسته بندی وجود نداشت
@@ -284,9 +383,17 @@ def TabProducts(req, namemain, subname, page):
         return redirect("products_home")
         # return HttpResponse("عدد وارد کنید")
 
+    # این حلقه برای دریافت تعداد کامل محصولات دسته بندی هستش
+    m_c = 0
+    sub = Subcategorise.objects.filter(parent=cat)
+    for i in sub:
+        p = Products.objects.filter(category=i)
+        for m in p:
+            m_c += 1
+
     # در اینجا با متغییر n_page تعداد نمایش گزینه هایصفحه رو کنترل میکنیم
-    max = list(Products.objects.all())
-    max = (len(max) // 10) + 1
+    max = m_c
+    max = (max // 10) + 1
 
     # این شرط چک میکنه اگر عدد صفحه بالا از max بود دیگه به صفحه بعدی نره
     # و دوباره همون صفحه آخر براش لود بشه
@@ -311,21 +418,40 @@ def TabProducts(req, namemain, subname, page):
         befor = num - 1
         after = num + 1
     # دراین filter زیردسته بندی رو آبجکتش رو در فیلتر قرار دایدم
-    pro = Products.objects.filter(category=sub, deleted=False)
+
+    # ....................................
+    cate1 = Categories.objects.all()
+    c_name = []
+    for a in cate1:
+        c_name.append([a.name])
+    #....................................
+
+    # ..............................// comment //..............................
+    # .
+    # دراینجا تمام زیر دسته های دسته بندی مورد نظر رو میکریم و داخل حلقه for
+    # قرار میدیم تا به تک تک زیر دسته ها و محصولاتشون دسترسی داشته باشیم
+    # .
+    # ..............................// comment //..............................
+    n = 0
+    sub = Subcategorise.objects.filter(parent=cat)
+    for p in sub:
+        pro = Products.objects.filter(category=p)
+        for i in pro:
+            n += 1
+            if s < n < c:
+                # در اینجا چون ما از  and  استفاده کردیم باید هردو شرط درست باشه به همین دلیل
+                # ما برابر c در elif قرار دادیم
+                listPro.append([i.name, i.count, i.category.name, i.show_price, i.id])
+            elif n == c:
+                listPro.append([i.name, i.count, i.category.name, i.show_price, i.id])
+                break
 
     # متغییر n برای ما شمارش تعداد حلقه رو بر عهده میگیره
-    n = 0
-    for i in pro:
-        n += 1
-        if s < n < c:
-            # در اینجا چون ما از  and  استفاده کردیم باید هردو شرط درست باشه به همین دلیل
-            # ما برابر c در elif قرار دادیم
-            listPro.append([i.name, i.count, i.category.name, i.show_price, i.id])
-        elif n == c:
-            listPro.append([i.name, i.count, i.category.name, i.show_price, i.id])
-            break
+
+    subi = 1
     return render(req, 'product/product.html', {"list": listPro, "page": n_page, "befor": befor,
-                                                "after": after, "loc_page": page, "max": max})
+                                                "after": after, "loc_page": page, "max": max, "subi": subi,
+                                                "namecat": namemain, "c_name": c_name})
 
 
 #...........................................................................................

@@ -34,7 +34,7 @@ Purchase:
     <link rel="stylesheet" href={% static "css/swiper-bundle.min.css"%} >
     <link rel="stylesheet" href={% static "css/comman.css"%} >
     <link rel="stylesheet" href={% static "css/style.css"%} >
-        {% block css %} {% endblock css %}
+        {% block link %} {% endblock link %}
     <!-- Favicon Link -->
     <link rel="shortcut icon" type="image/png" href={% static "images/index1/favicon.png"%}>
 
@@ -48,6 +48,7 @@ Purchase:
                     max-width: 700px;
                 }
             }
+            {% block css %} {% endblock css %}
         </style>
     </head>
     <body>
@@ -116,6 +117,11 @@ Purchase:
                             <a href="{% url 'account_login' %}">ورود </a>
                         </li>
                         {% endif %}
+                            {% if login == 1 %}
+                                <li>
+                            <a href="{% url 'account_logout' %}"> خروج از حساب کاربری </a>
+                                </li>
+                                {% endif %}
                         <!-- pop up login and register -->
 {#                        <li>#}
 {#                            <a href="javascript:void(0);" data-toggle="modal" data-target="#register">ثبت نام </a> یا#}
@@ -412,7 +418,7 @@ Purchase:
 
 {#  برای پیدا کردن محتوای صفحه به جز هدر و فوتر این موارد رو سرچ کن #}
 <!-- Newsletter start -->
-    <section class="e-newsletter-wrap e-newsletter-cloth">
+    <section class="e-newsletter-wrap e-newsletter-cloth" id="bikhod">
     <div class="container">
         <div class="row">
             <div class="col-12">
@@ -798,6 +804,7 @@ Purchase:
     <script src={% static "js/swiper-bundle.min.js"%}></script>
     <script src={% static "js/isotope.pkgd.min.js"%}></script>
     <script src={% static "js/custom.js"%}></script>
+    {% block jslink %}{% endblock jslink %}
     </body>
 
     </html>

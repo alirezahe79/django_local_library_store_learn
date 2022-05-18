@@ -24,7 +24,8 @@ MODULES = ["account",
            "product",
            "cart",
            'wishlist',
-           'gateway']
+           'gateway',
+           'mprofile']
 for MODULE in MODULES:
     MODULES_DIR = os.path.join(BASE_DIR, MODULE)
     print(MODULES_DIR)
@@ -57,6 +58,7 @@ INSTALLED_APPS = [
     'cart',
     'factor',
     'wishlist',
+    'mprofile',
 ]
 
 
@@ -142,7 +144,7 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
-print(BASE_DIR,"*")
+print(BASE_DIR, "*")
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
